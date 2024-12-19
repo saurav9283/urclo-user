@@ -15,6 +15,7 @@ const UserRouter = require('./routes/User/userAuth/auth.router.js');
 const UserCartRouter = require('./routes/User/UserCart/user.cart.router.js');
 const UserNoifyRouter = require('./routes/User/userNotification/user.notification.router.js');
 const userMasterCatRouter = require('./routes/User/userService/user.service.router.js');
+const RabbitConnect = require('./utils/RabbitMQ .js');
 
 var app = express();
 const server = http.createServer(app);
@@ -78,6 +79,9 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+RabbitConnect.connect();
+
 const PORT = "5656";
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

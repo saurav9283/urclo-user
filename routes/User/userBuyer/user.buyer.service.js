@@ -35,6 +35,8 @@ module.exports = {
             return callback(error);
         }
     },
+
+    
     DeletebuyerRecode: (user_id, sub_cat_id, provider_id, callback) => {
         try {
             const deleteOrderQuery = process.env.DELETE_ORDER_QUERY
