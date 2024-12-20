@@ -16,6 +16,7 @@ const UserCartRouter = require('./routes/User/UserCart/user.cart.router.js');
 const UserNoifyRouter = require('./routes/User/userNotification/user.notification.router.js');
 const userMasterCatRouter = require('./routes/User/userService/user.service.router.js');
 const RabbitConnect = require('./utils/RabbitMQ .js');
+const { updateOnOrderNotificationService } = require('./routes/User/userNotification/user.notification.service.js');
 
 var app = express();
 const server = http.createServer(app);
@@ -63,6 +64,17 @@ app.use('/api/get/mastercat', userMasterCatRouter);
 app.get('/api', (req, res) => {
   res.send("Api is working fine")
 })
+
+RabbitConnect.subscribeToQueue("order-accept", async(message) => {
+  try {
+    console.log('Received message: for user dashboard order accept', JSON.parse(message));
+    const { user_id, providerName } = JSON.parse(message);
+    await updateOnOrderNotificationService(user_id, providerName);
+  } catch (error) {
+    console.error('Error processing RabbitMQ message:', error);
+  }
+})
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
