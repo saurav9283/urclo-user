@@ -26,6 +26,7 @@ module.exports = {
         });
     },
     getsubcategoryService: (cat_id, callback) => {
+        console.log('cat_id: ', cat_id);
         const getSubCategoryQuery = process.env.GET_SUB_CATEGORY_SERVICE
         .replace('<cat_id>' , cat_id);
         console.log('getSubCategoryQuery: ', getSubCategoryQuery);

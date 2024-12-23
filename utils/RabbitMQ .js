@@ -1,7 +1,7 @@
 const amqp = require('amqplib');
 // amqps://vtfzydcl:vuVcJ22Ur6D5JCJk343z65nxZZKkhP8A@moose.rmq.cloudamqp.com/vtfzydcl 
-
-const RABBITMQ_URL = process.env.RABBIT_URL ||  'amqp://guest:guest@localhost:5672';
+// 'amqp://guest:guest@localhost:5672'
+const RABBITMQ_URL = process.env.RABBIT_URL ||  'amqps://vtfzydcl:vuVcJ22Ur6D5JCJk343z65nxZZKkhP8A@moose.rmq.cloudamqp.com/vtfzydcl';
 
 let connection, channel;
 
