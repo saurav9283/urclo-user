@@ -27,6 +27,7 @@ module.exports = {
     RemoveFromCartController: async (req, res) => {
         try {
             const { user_id, cat_id,masterId ,sub_cat_id } = req.body;
+            console.log('req.body: ', req.body);
             if (!user_id) {
                 return res.status(400).json({ message: "You are not Login" });
             }
@@ -45,13 +46,17 @@ module.exports = {
         }
     },
     GetCartController: async (req, res) => {
-        const { user_id } = req.body;
+        const { user_id } = req.query;
+        console.log('req.query: ', req.query);
+        if(!user_id){
+            return res.status(400).json({ message: "You are not Login" });
+        }
 
         GetCartService(user_id, (err, result) => {
             if (err) {
                 return res.status(500).json({ message: "Internal Server Error" });
             }
-            return res.status(200).json({ message: result });
+            return res.status(200).json({ result });
         });
     },
     GetCOuntCartController: async (req, res) => {

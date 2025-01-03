@@ -89,46 +89,6 @@ module.exports = {
             callback(error);
         }
     },
-    // GetCartService: async (user_id, callback) => {
-    //     try {
-    //         const getCart = process.env.GET_CART.replace('<user_id>', user_id);
-    //         console.log('getCart: ', getCart);
-    //         pool.query(getCart, (err, result) => {
-    //             if (err) {
-    //                 console.error("Error getting cart:", err.message);
-    //                 return callback(err);
-    //             }
-    //             console.log('result: ', result);
-    //             const subCatIds = result.map(row => row.sub_cat_id);
-    //             console.log('subCatIds:', subCatIds);
-
-    //             if (subCatIds.length === 0) {
-    //                 return callback(null, { message: "Your Cart is Empty" });
-    //             }
-    //             const formattedSubCatIds = subCatIds.map(id => `'${id}'`).join(',');
-    //             const subCatQuery = process.env.GET_SUB_CAT_DETAILS
-    //             .replace('<sub_cat_id>', formattedSubCatIds);
-
-    //             console.log('subCatQuery: ', subCatQuery);
-    //             pool.query(subCatQuery, [subCatIds], (err, subCatResult) => {
-    //                 if (err) {
-    //                     console.error("Error fetching from tbl_cart:", err.message);
-    //                     return callback(err);
-    //                 }
-    //                 console.log('subCatResult: ', subCatResult);
-
-    //                 // Format and send the response
-
-    //                 callback(null, subCatResult);
-    //             });
-
-    //         });
-
-    //     } catch (error) {
-    //         console.error("Error:", error.message);
-    //         callback(error);
-    //     }
-    // },
 
     GetCartService: async (user_id, callback) => {
         try {
@@ -171,17 +131,32 @@ module.exports = {
                         return countMap;
                     }, {});
 
-                    // Format the response
-                    const formattedResponse = subCatResult.map(row => ({
-                        masterId: row.master_id,
-                        cat_id: row.cat_id,
-                        sub_cat_id: row.sub_cat_id,
-                        sub_cat_name: row.sub_cat_name,
-                        standard_price: row.standard_price,
-                        count: subCatCount[row.sub_cat_id] || 0,
-                    }));
+                    // const formattedResponse = subCatResult.map(row => ({
+                    //     masterId: row.masterId,
+                    //     cat_id: row.cat_id,
+                    //     sub_cat_id: row.sub_cat_id,
+                    //     sub_cat_name: row.sub_cat_name,
+                    //     standard_price: row.standard_price,
+                    //     count: subCatCount[row.sub_cat_id] || 0,
+                    //     cat_name: row.cat_name,
+                    //     cat_image: row.image_banner_url
+                    // }));
+                    const formattedResponse = subCatResult.map(row => {
+                        const cartItem = result.find(item => item.sub_cat_id === row.sub_cat_id);
+                        return {
+                            masterId: row.masterId,
+                            cat_id: row.cat_id,
+                            sub_cat_id: row.sub_cat_id,
+                            sub_cat_name: row.sub_cat_name,
+                            standard_price: row.standard_price,
+                            quantity: cartItem ? cartItem.quantity : 0,
+                            cat_name: row.cat_name,
+                            cat_image: row.image_banner_url
+                        };
+                    });
+                    // console.log('formattedResponse: ', formattedResponse);
 
-                    callback(null, { message: formattedResponse });
+                    callback(null, formattedResponse );
                 });
             });
 

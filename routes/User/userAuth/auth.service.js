@@ -5,6 +5,7 @@ const {sendSms} = require('../../../services/sms-service');
 module.exports = {
     getUserByEmail: (email, callback) => {
         const query = process.env.CHECKEXISTINGEMAIL.replace('<email>', email);
+        console.log('query: ', query);
         pool.query(query, (err, result) => {
             if (err) {
                 console.error("Error checking email:", err);

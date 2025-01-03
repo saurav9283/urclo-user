@@ -7,10 +7,12 @@ const jwt = require('jsonwebtoken');
 const { saveResetToken } = require('../../../lib/saveToken');
 const { NotificationController } = require('../userNotification/user.notification.controller');
 const { notificationService } = require('../userNotification/user.notification.service');
+const { name } = require('ejs');
 module.exports = {
     register: async (req, res) => {
         try {
             const { name, email, phone, password, provider } = req.body;
+            console.log('req.body: ', req.body);
 
             if (!provider) {
                 return res.status(400).json({ msg: "Provider is required" });
@@ -20,19 +22,6 @@ module.exports = {
                 return res.status(400).json({ msg: "All fields are required" });
             }
 
-            // if (provider === 'google') {
-            //     if (!idToken) {
-            //         return res.status(400).json({ msg: "Google ID token is required" });
-            //     }
-
-            //     // Verify Google ID token
-            //     const googlePayload = await verifyGo2ogleToken(idToken);
-            //     email = googlePayload.email;
-            //     name = googlePayload.name;
-            //     userProvider = 'Google';
-            // }
-            // Check if user exists by email
-            
             const emailExists = await new Promise((resolve, reject) => {
                 getUserByEmail(email, (err, result) => {
                     if (err) reject(err);
@@ -171,8 +160,15 @@ module.exports = {
                 return res.status(500).json({ msg: "Internal server error" });
             }
             else {
+                const tokenPayload = {
+                    userId: user.id,
+                    phone: user.phone,
+                    name: user.name,
+                };
+
+                const jwtToken = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
                 await notificationService(user.id, user.name);
-                return res.status(200).json({ msg: "Phone verified successfully", user_id: user.id });
+                return res.status(200).json({ msg: "Phone verified successfully", user_id: user.id, token: jwtToken,name:user.name });
             }
         });
     },
@@ -289,7 +285,8 @@ module.exports = {
                         return res.status(500).json({ msg: "Internal server error" });
                     }
                     else {
-                        return res.status(201).json({ msg: "OTP sent successfully" });
+                        
+                        return res.status(201).json({ msg: "OTP sent successfully"});
                     }
 
                 })
@@ -315,9 +312,16 @@ module.exports = {
                     return res.status(400).json({ msg: "Invalid password" });
                 }
                 else {
+                    const tokenPayload = {
+                        userId: user.id,
+                        email: user.email,
+                        name: user.name,
+                    };
+                    const jwtToken = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+
                     await notificationService(user.id, user.name);
 
-                    return res.status(201).json({ msg: "Login successful", user_id: user.id });
+                    return res.status(201).json({ msg: "Login successful", user_id: user.id, token: jwtToken,name:user.name });
                 }
             }
         } catch (error) {
